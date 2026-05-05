@@ -73,7 +73,7 @@
     font-weight: 600;
     line-height: 1.2;
     color: var(--text);
-    margin-bottom: 0.9rem;
+    margin-bottom: 1.25rem;
   }
 
   h1 span {
@@ -305,33 +305,45 @@
 </div>
 
 <script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKo4VfV5K90vRDowHrNb1RFQvBd2X0tiJQMKzeS5vb5Ar92jda1ZCs0UXFNXrAKGDFvQ/exec';
+
 function submitForm() {
+  var name = document.getElementById('name').value.trim();
   var email = document.getElementById('email').value.trim();
+  var phone = document.getElementById('phone').value.trim();
   var consent = document.getElementById('consent').checked;
   var btn = document.getElementById('submit-btn');
   var emailError = document.getElementById('email-error');
 
   emailError.style.display = 'none';
 
-  var valid = true;
   if (!email || !email.includes('@')) {
     emailError.style.display = 'block';
-    valid = false;
+    return;
   }
   if (!consent) {
     alert('Prašome sutikti su prenumeratos sąlygomis.');
     return;
   }
-  if (!valid) return;
 
   btn.disabled = true;
   btn.textContent = 'Siunčiama...';
 
-  setTimeout(function() {
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: name, email: email, phone: phone })
+  })
+  .then(function() {
     document.getElementById('form-section').style.display = 'none';
-    var s = document.getElementById('success-msg');
-    s.style.display = 'block';
-  }, 800);
+    document.getElementById('success-msg').style.display = 'block';
+  })
+  .catch(function() {
+    btn.disabled = false;
+    btn.textContent = 'Prenumeruoti naujienas →';
+    alert('Klaida. Bandykite dar kartą.');
+  });
 }
 </script>
 </body>
